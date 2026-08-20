@@ -13,8 +13,8 @@ open here instead of [explorer.e.cash](https://explorer.e.cash).
 | Token / address pages list **unrelated** XEC and ALP txs | Memorial page lists **only that star’s offerings**; remint page is one lotus bloom; ordinary payments show a quiet “not Dana” screen |
 | Looks like a blockchain explorer (inputs, outputs, fees) | Reads like a temple ledger — no UTXO dump |
 
-Drop-in path: `https://danaverse.org/tx/<txid>` (same `/tx/` shape as explorer.e.cash).
-Bare `https://danaverse.org/<txid>` also works.
+Canonical path: `https://danaverse.org/offering/<id>` (a ledger offering, not a chain `tx`).
+Aliases `/tx/<id>` and `/<id>` still open the same page and rewrite to `/offering/`.
 
 ## Local
 
@@ -31,7 +31,7 @@ A single tx still decodes from Chronik if the index is down.
 ## Host on danaverse.org
 
 Static Vite build — **no Node process**. The **free** tiers of Netlify or
-GitHub Pages are enough. **Netlify is the easier choice** because `/tx/<txid>`
+GitHub Pages are enough. **Netlify is the easier choice** because `/offering/<id>`
 can return HTTP 200.
 
 See **[deploy/FREE.md](./deploy/FREE.md)** (Netlify + GitHub Pages + DNS).

@@ -5,7 +5,7 @@ Temple is a **static Vite SPA**. The browser talks to public Chronik and
 [Netlify](https://www.netlify.com/) and [GitHub Pages](https://pages.github.com/)
 are enough.
 
-**Prefer Netlify** for danaverse.org. It can serve `/tx/<txid>` as HTTP 200
+**Prefer Netlify** for danaverse.org. It can serve `/offering/<id>` as HTTP 200
 (real SPA rewrite). GitHub Pages has to fake that with `404.html`.
 
 ## Netlify (recommended)
@@ -54,7 +54,7 @@ Until the custom domain is live, the site is `https://danaverse.github.io/temple
 only if you set Vite `base` to `/temple/`. **Do not** do that if danaverse.org
 is the real host — keep `base: '/'` (the default).
 
-Direct `/tx/<txid>` on Pages returns HTTP 404 with the app HTML. The page still
+Direct `/offering/<id>` on Pages returns HTTP 404 with the app HTML. The page still
 opens in a browser; Netlify is cleaner for those links.
 
 ## What you do not need

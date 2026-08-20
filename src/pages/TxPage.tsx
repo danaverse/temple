@@ -18,7 +18,7 @@ import {
   fetchIndexRecent,
   type IndexMemorialGroup,
 } from '../lib/indexApi.js';
-import { txPath } from '../lib/routes.js';
+import { offeringPath } from '../lib/routes.js';
 
 function whenLabel(
   t: Copy,
@@ -172,10 +172,10 @@ export function TxPage(props: {
         {classified.tokenId ? (
           <p>
             <a
-              href={txPath(classified.tokenId)}
+              href={offeringPath(classified.tokenId)}
               onClick={e => {
                 e.preventDefault();
-                onOpen(txPath(classified.tokenId!));
+                onOpen(offeringPath(classified.tokenId!));
               }}
             >
               {tokenMeta?.ticker || t.tokenLabel} {shortTx(classified.tokenId)}
@@ -210,10 +210,10 @@ export function TxPage(props: {
             <li key={g.originalBurnTxid}>
               <a
                 className="row"
-                href={txPath(g.originalBurnTxid)}
+                href={offeringPath(g.originalBurnTxid)}
                 onClick={e => {
                   e.preventDefault();
-                  onOpen(txPath(g.originalBurnTxid));
+                  onOpen(offeringPath(g.originalBurnTxid));
                 }}
               >
                 <div className="row-title">

@@ -7,7 +7,7 @@ import {
   searchIndexMemorials,
   type IndexMemorialGroup,
 } from '../lib/indexApi.js';
-import { txPath } from '../lib/routes.js';
+import { offeringPath } from '../lib/routes.js';
 
 export function HomePage(props: {
   t: Copy;
@@ -75,10 +75,10 @@ export function HomePage(props: {
             <li key={g.originalBurnTxid}>
               <a
                 className="row"
-                href={txPath(g.originalBurnTxid)}
+                href={offeringPath(g.originalBurnTxid)}
                 onClick={e => {
                   e.preventDefault();
-                  onOpen(txPath(g.originalBurnTxid));
+                  onOpen(offeringPath(g.originalBurnTxid));
                 }}
               >
                 <div className="row-title">{name}</div>

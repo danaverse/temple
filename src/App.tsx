@@ -6,13 +6,20 @@ import {
   readStoredLocale,
   writeStoredLocale,
 } from './i18n.js';
-import { parseRoute, type Route } from './lib/routes.js';
+import { canonicalPath, parseRoute, type Route } from './lib/routes.js';
 import { HomePage } from './pages/Home.js';
 import { TxPage } from './pages/TxPage.js';
 
 function currentRoute(): Route {
   if (typeof window === 'undefined') return { page: 'home', query: '' };
-  return parseRoute(window.location.pathname, window.location.search);
+  const route = parseRoute(window.location.pathname, window.location.search);
+  if (route.page === 'offering') {
+    const want = canonicalPath(route);
+    if (window.location.pathname !== want) {
+      window.history.replaceState(null, '', want + window.location.search);
+    }
+  }
+  return route;
 }
 
 export function App() {
