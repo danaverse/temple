@@ -30,23 +30,13 @@ A single tx still decodes from Chronik if the index is down.
 
 ## Host on danaverse.org
 
-Static Vite build. No Node process required on the server.
+Static Vite build — **no Node process**. The **free** tiers of Netlify or
+GitHub Pages are enough. **Netlify is the easier choice** because `/tx/<txid>`
+can return HTTP 200.
 
-```bash
-npm ci
-npm run build
-# dist/ → web root
-```
+See **[deploy/FREE.md](./deploy/FREE.md)** (Netlify + GitHub Pages + DNS).
 
-Nginx sketch lives in [`deploy/nginx-danaverse.conf`](./deploy/nginx-danaverse.conf):
-
-1. Point **danaverse.org** (and www) A/AAAA at the host.
-2. `sudo cp deploy/nginx-danaverse.conf /etc/nginx/sites-available/danaverse`
-3. Enable the site, `nginx -t`, reload.
-4. `certbot --nginx -d danaverse.org -d www.danaverse.org`
-5. Copy `dist/` to `/var/www/danaverse`.
-
-SPA fallback: unknown paths serve `index.html` so `/tx/<txid>` works.
+VPS/nginx is optional: [`deploy/nginx-danaverse.conf`](./deploy/nginx-danaverse.conf).
 
 Optional env (bake at build time):
 

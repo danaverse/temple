@@ -1,5 +1,9 @@
 # Host Temple on danaverse.org
 
+**Free (recommended):** [FREE.md](./FREE.md) — Netlify or GitHub Pages.
+
+VPS/nginx (optional):
+
 Build on any machine with Node 20+:
 
 ```bash
