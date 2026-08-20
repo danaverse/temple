@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Locale } from './i18n.js';
 import {
-  detectLocale,
+  bootLocale,
   MESSAGES,
-  readStoredLocale,
+  withLangQuery,
   writeStoredLocale,
 } from './i18n.js';
 import { canonicalPath, parseRoute, type Route } from './lib/routes.js';
@@ -25,8 +25,13 @@ function currentRoute(): Route {
 export function App() {
   const [route, setRoute] = useState<Route>(currentRoute);
   const [locale, setLocale] = useState<Locale>(() => {
-    if (typeof navigator === 'undefined') return 'vi';
-    return readStoredLocale() || detectLocale(navigator.languages || [navigator.language]);
+    if (typeof window === 'undefined') return 'vi';
+    const next = bootLocale(
+      window.location.search,
+      navigator.languages || [navigator.language],
+    );
+    writeStoredLocale(next);
+    return next;
   });
   const t = MESSAGES[locale];
 
@@ -43,14 +48,23 @@ export function App() {
   }, []);
 
   const go = useCallback((path: string) => {
-    window.history.pushState(null, '', path);
+    window.history.pushState(null, '', withLangQuery(path, locale));
     setRoute(currentRoute());
     window.scrollTo(0, 0);
-  }, []);
+  }, [locale]);
 
   const changeLocale = useCallback((next: Locale) => {
     writeStoredLocale(next);
     setLocale(next);
+    if (typeof window === 'undefined') return;
+    window.history.replaceState(
+      null,
+      '',
+      withLangQuery(
+        window.location.pathname + window.location.search + window.location.hash,
+        next,
+      ),
+    );
   }, []);
 
   const langs = useMemo(

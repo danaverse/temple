@@ -28,5 +28,9 @@ describe('routes', () => {
   it('keeps search on the home ledger, not a block list', () => {
     expect(parseRoute('/', '?q=Quả')).toEqual({ page: 'home', query: 'Quả' });
     expect(parseRoute('/address/ecash:qxyz')).toEqual({ page: 'home', query: '' });
+    expect(parseRoute(`/offering/${ID}`, '?lang=zh')).toEqual({
+      page: 'offering',
+      txid: ID,
+    });
   });
 });

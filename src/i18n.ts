@@ -176,6 +176,42 @@ export function detectLocale(
   return 'vi';
 }
 
+/** Same `?lang=` W Lotus puts on share URLs. Also accepts `locale`. */
+export function localeFromSearch(search: string): Locale | null {
+  const params = new URLSearchParams(
+    search.startsWith('?') ? search : `?${search}`,
+  );
+  const raw = (params.get('lang') || params.get('locale') || '')
+    .trim()
+    .toLowerCase();
+  const primary = raw.split(/[,;_-]/)[0]?.trim() ?? '';
+  if (primary === 'en' || primary === 'vi' || primary === 'zh') return primary;
+  return null;
+}
+
+export function withLangQuery(path: string, locale: Locale): string {
+  const hashIndex = path.indexOf('#');
+  const hash = hashIndex >= 0 ? path.slice(hashIndex) : '';
+  const withoutHash = hashIndex >= 0 ? path.slice(0, hashIndex) : path;
+  const qIndex = withoutHash.indexOf('?');
+  const pathname = qIndex >= 0 ? withoutHash.slice(0, qIndex) : withoutHash;
+  const search = qIndex >= 0 ? withoutHash.slice(qIndex + 1) : '';
+  const params = new URLSearchParams(search);
+  params.set('lang', locale);
+  return `${pathname}?${params.toString()}${hash}`;
+}
+
+export function bootLocale(
+  search = '',
+  languages: readonly string[] = [],
+): Locale {
+  return (
+    localeFromSearch(search) ||
+    readStoredLocale() ||
+    detectLocale(languages)
+  );
+}
+
 export function readStoredLocale(): Locale | null {
   try {
     const raw = localStorage.getItem(LOCALE_STORAGE_KEY)?.trim().toLowerCase();
