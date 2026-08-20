@@ -191,6 +191,16 @@ h2 {
   font-weight: 600;
   font-size: 1.02rem;
 }
+.row-note {
+  margin-top: 0.28rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .row-meta {
   color: var(--muted);
   font-size: 0.82rem;
