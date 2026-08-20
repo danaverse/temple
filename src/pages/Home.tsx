@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import type { Copy, Locale } from '../i18n.js';
 import { formatCount } from '../i18n.js';
 import { memorialDisplayName } from '../lib/altar.js';
@@ -8,6 +8,7 @@ import {
   type IndexMemorialGroup,
 } from '../lib/indexApi.js';
 import { offeringPath } from '../lib/routes.js';
+import { useDanaLiveRefresh } from '../lib/useDanaLive.js';
 
 export function HomePage(props: {
   t: Copy;
@@ -20,6 +21,7 @@ export function HomePage(props: {
   const [items, setItems] = useState<IndexMemorialGroup[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const searching = Boolean(props.initialQuery.trim());
 
   useEffect(() => {
     let cancelled = false;
@@ -27,7 +29,7 @@ export function HomePage(props: {
       setLoading(true);
       setError(null);
       try {
-        const list = props.initialQuery.trim()
+        const list = searching
           ? await searchIndexMemorials(props.initialQuery, 30)
           : await fetchIndexRecent(40);
         if (!cancelled) setItems(list);
@@ -41,7 +43,20 @@ export function HomePage(props: {
     return () => {
       cancelled = true;
     };
-  }, [props.initialQuery, t.loadError]);
+  }, [props.initialQuery, searching, t.loadError]);
+
+  const refreshRecent = useCallback(async () => {
+    if (searching) return;
+    try {
+      const list = await fetchIndexRecent(40);
+      setItems(list);
+      setError(null);
+    } catch {
+      /* keep the last good list */
+    }
+  }, [searching]);
+
+  useDanaLiveRefresh(refreshRecent, !searching);
 
   function onSearch(e: FormEvent) {
     e.preventDefault();
@@ -67,7 +82,7 @@ export function HomePage(props: {
       {!loading && !error && items.length === 0 ? (
         <p className="status">{t.emptyRecent}</p>
       ) : null}
-      <ul className="list">
+      <ul className="list" aria-live="polite">
         {items.map(g => {
           const name =
             memorialDisplayName(g.originalNote, locale) || t.noName;

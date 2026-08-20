@@ -4,6 +4,7 @@ import {
   memorialPushdata,
   parseDanaTip,
   parseMemorialPushdata,
+  DANA_LOKAD_HEX,
 } from '../src/lib/dana.js';
 import { emppScriptHex, parseEmppPushes } from '../src/lib/empp.js';
 
@@ -11,6 +12,10 @@ const PARENT =
   '7ab478bcfddf6eb5130d33395846012c20b92ac48f19025ef8d53ba3d7d5e359';
 
 describe('DANA memorial', () => {
+  it('exposes DANA as Chronik lokad hex', () => {
+    expect(DANA_LOKAD_HEX).toBe('44414e41');
+  });
+
   it('round-trips v1 and decodes the note', () => {
     const raw = memorialPushdata('for Anh', 'wlotus');
     const parsed = parseMemorialPushdata(raw);
