@@ -1,7 +1,7 @@
 {
   "name": "@danaverse/temple",
   "version": "0.1.0",
-  "description": "Temple — Dana explorer. Decodes DANA memorials and remints without a blockchain dump.",
+  "description": "Danaverse — giving without keeping. A public temple of names remembered and gifts given up for all.",
   "private": true,
   "type": "module",
   "scripts": {
