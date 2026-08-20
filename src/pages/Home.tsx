@@ -1,13 +1,18 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { OfferingRows } from '../components/OfferingRows.js';
 import type { Copy, Locale } from '../i18n.js';
+import { fetchClassifiedTx } from '../lib/chronik.js';
 import {
   fetchIndexRecent,
   searchIndexMemorials,
   type IndexMemorialGroup,
 } from '../lib/indexApi.js';
-import { indexListStamp } from '../lib/live.js';
-import { useIndexPoll } from '../lib/useIndexPoll.js';
+import {
+  applyMemorialLive,
+  classifiedToIndexBurn,
+  indexListStamp,
+} from '../lib/live.js';
+import { useDanaLive } from '../lib/useDanaLive.js';
 
 export function HomePage(props: {
   t: Copy;
@@ -44,20 +49,23 @@ export function HomePage(props: {
     };
   }, [props.initialQuery, searching, t.loadError]);
 
-  const refreshRecent = useCallback(async () => {
+  const onLiveTxid = useCallback(async (txid: string) => {
     if (searching) return;
     try {
-      const list = await fetchIndexRecent(40);
-      setItems(prev =>
-        indexListStamp(prev) === indexListStamp(list) ? prev : list,
-      );
+      const classified = await fetchClassifiedTx(txid);
+      const burn = classifiedToIndexBurn(classified);
+      if (!burn) return;
+      setItems(prev => {
+        const next = applyMemorialLive(prev, burn);
+        return indexListStamp(prev) === indexListStamp(next) ? prev : next;
+      });
       setError(null);
     } catch {
       /* keep the last good list */
     }
   }, [searching]);
 
-  useIndexPoll(refreshRecent, !searching);
+  useDanaLive(onLiveTxid, !searching);
 
   function onSearch(e: FormEvent) {
     e.preventDefault();
