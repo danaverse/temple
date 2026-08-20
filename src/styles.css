@@ -13,6 +13,8 @@
   --danger: #e07a6a;
   --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
   --font-body: 'DM Sans', system-ui, sans-serif;
+  /* dana.png is black on transparent — invert on dark skins. */
+  --brand-logo-filter: brightness(0) invert(1);
   color-scheme: dark;
 }
 
@@ -27,6 +29,7 @@
   --surface: rgba(255, 255, 255, 0.06);
   --btn: #ffffff;
   --btn-ink: #0a0a0a;
+  --brand-logo-filter: brightness(0) invert(1);
   color-scheme: dark;
 }
 
@@ -41,6 +44,7 @@
   --surface: rgba(90, 55, 25, 0.08);
   --btn: #7a2e22;
   --btn-ink: #fff8ef;
+  --brand-logo-filter: none;
   color-scheme: light;
 }
 
@@ -73,13 +77,16 @@ a:hover {
 
 .top {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.75rem;
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
   font-family: var(--font-display);
   font-size: 1.65rem;
   font-weight: 600;
@@ -90,6 +97,19 @@ a:hover {
 .brand:hover {
   text-decoration: none;
 }
+.brand-logo {
+  width: 2.55rem;
+  height: 2.55rem;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: var(--brand-logo-filter, none);
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
 .brand-sub {
   display: block;
   font-family: var(--font-body);
@@ -97,7 +117,7 @@ a:hover {
   color: var(--muted);
   font-weight: 400;
   letter-spacing: 0.04em;
-  margin-top: 0.15rem;
+  margin-top: 0.12rem;
 }
 
 .langs {

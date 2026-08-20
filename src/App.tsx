@@ -72,8 +72,18 @@ export function App() {
     <div className="app">
       <header className="top">
         <a className="brand" href="/" onClick={e => { e.preventDefault(); go('/'); }}>
-          {t.home}
-          <span className="brand-sub">{t.tagline}</span>
+          <img
+            className="brand-logo"
+            src="/dana.png"
+            alt=""
+            width={48}
+            height={48}
+            draggable={false}
+          />
+          <span className="brand-text">
+            {t.home}
+            <span className="brand-sub">{t.tagline}</span>
+          </span>
         </a>
         <nav className="langs" aria-label="Language">
           {langs}
