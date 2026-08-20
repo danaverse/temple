@@ -28,6 +28,11 @@ The browser talks to public Chronik mirrors and to the W Lotus DANA index
 (`https://wlotus.org/index-api`, CORS is open) for recent / search / star groups.
 A single tx still decodes from Chronik if the index is down.
 
+After the first load, the home list and offering pages stay current: Chronik
+`subscribeToLokadId` on **DANA** (`44414e41`) signals mempool and confirmed
+burns, then Temple re-reads the index (with a short retry, because the index
+can lag the socket).
+
 ## Host on danaverse.org
 
 Static Vite build — **no Node process**. The **free** tiers of Netlify or

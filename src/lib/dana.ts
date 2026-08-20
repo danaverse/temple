@@ -11,6 +11,8 @@
 import { bytesToHex } from './empp.js';
 
 export const DANA_LOKAD = new TextEncoder().encode('DANA');
+/** Chronik websocket `subscribeToLokadId` wants 8 lowercase hex chars. */
+export const DANA_LOKAD_HEX = bytesToHex(DANA_LOKAD);
 export const DANA_VERSION = 1;
 export const DANA_VERSION_PARENT = 2;
 export const DANA_TIP_VERSION = 4;

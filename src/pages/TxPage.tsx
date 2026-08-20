@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import type { Copy, Locale } from '../i18n.js';
 import { formatCount } from '../i18n.js';
 import {
@@ -19,6 +19,7 @@ import {
   type IndexMemorialGroup,
 } from '../lib/indexApi.js';
 import { offeringPath } from '../lib/routes.js';
+import { useDanaLiveRefresh } from '../lib/useDanaLive.js';
 
 function whenLabel(
   t: Copy,
@@ -53,6 +54,32 @@ function AltarDl(props: { t: Copy; altar: AltarFields }) {
   );
 }
 
+async function loadOffering(txid: string): Promise<{
+  classified: ClassifiedTx;
+  group: IndexMemorialGroup | null;
+  recent: IndexMemorialGroup[];
+  tokenMeta: { ticker: string; name: string } | null;
+}> {
+  const [tx, indexed] = await Promise.all([
+    fetchClassifiedTx(txid),
+    fetchIndexMemorial(txid).catch(() => null),
+  ]);
+  let tokenMeta: { ticker: string; name: string } | null = null;
+  let recent: IndexMemorialGroup[] = [];
+  if (tx.kind === 'genesis' && tx.tokenId) {
+    const [meta, rec] = await Promise.all([
+      fetchTokenInfo(tx.tokenId),
+      fetchIndexRecent(40).catch(() => [] as IndexMemorialGroup[]),
+    ]);
+    if (meta) tokenMeta = { ticker: meta.ticker, name: meta.name };
+    recent = rec.filter(g => g.burns.some(b => b.tokenId === tx.tokenId));
+  } else if (tx.kind === 'remint' && tx.tokenId) {
+    const meta = await fetchTokenInfo(tx.tokenId);
+    if (meta) tokenMeta = { ticker: meta.ticker, name: meta.name };
+  }
+  return { classified: tx, group: indexed, recent, tokenMeta };
+}
+
 export function TxPage(props: {
   t: Copy;
   locale: Locale;
@@ -79,28 +106,12 @@ export function TxPage(props: {
       setRecent([]);
       setTokenMeta(null);
       try {
-        const [tx, indexed] = await Promise.all([
-          fetchClassifiedTx(txid),
-          fetchIndexMemorial(txid).catch(() => null),
-        ]);
+        const next = await loadOffering(txid);
         if (cancelled) return;
-        setClassified(tx);
-        setGroup(indexed);
-        if (tx.kind === 'genesis' && tx.tokenId) {
-          const [meta, rec] = await Promise.all([
-            fetchTokenInfo(tx.tokenId),
-            fetchIndexRecent(40).catch(() => [] as IndexMemorialGroup[]),
-          ]);
-          if (cancelled) return;
-          if (meta) setTokenMeta({ ticker: meta.ticker, name: meta.name });
-          setRecent(
-            rec.filter(g => g.burns.some(b => b.tokenId === tx.tokenId)),
-          );
-        }
-        if (tx.kind === 'remint' && tx.tokenId) {
-          const meta = await fetchTokenInfo(tx.tokenId);
-          if (!cancelled && meta) setTokenMeta({ ticker: meta.ticker, name: meta.name });
-        }
+        setClassified(next.classified);
+        setGroup(next.group);
+        setRecent(next.recent);
+        setTokenMeta(next.tokenMeta);
       } catch {
         if (!cancelled) setError(t.loadError);
       } finally {
@@ -112,6 +123,21 @@ export function TxPage(props: {
       cancelled = true;
     };
   }, [txid, t.loadError]);
+
+  const silentRefresh = useCallback(async () => {
+    try {
+      const next = await loadOffering(txid);
+      setClassified(next.classified);
+      setGroup(next.group);
+      setRecent(next.recent);
+      setTokenMeta(next.tokenMeta);
+      setError(null);
+    } catch {
+      /* keep the last good page */
+    }
+  }, [txid]);
+
+  useDanaLiveRefresh(silentRefresh, true);
 
   const altar = useMemo(() => {
     const notes: string[] = [];
@@ -205,7 +231,7 @@ export function TxPage(props: {
         <p className="hint">{t.notDanaHint}</p>
         <h2>{t.recentTitle}</h2>
         {recent.length === 0 ? <p className="status">{t.emptyRecent}</p> : null}
-        <ul className="list">
+        <ul className="list" aria-live="polite">
           {recent.map(g => (
             <li key={g.originalBurnTxid}>
               <a
@@ -266,7 +292,7 @@ export function TxPage(props: {
       {burns.length > 0 ? (
         <>
           <h2>{t.recentTitle}</h2>
-          <ul className="list">
+          <ul className="list" aria-live="polite">
             {burns.map(b => {
               const extra = (b.note || '').trim();
               const label = extra
