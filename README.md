@@ -35,11 +35,10 @@ The index is only for the initial recent / search / star group paint.
 
 ## Host on danaverse.org
 
-Static Vite build — **no Node process**. The **free** tiers of Netlify or
-GitHub Pages are enough. **Netlify is the easier choice** because `/offering/<id>`
-can return HTTP 200.
+Static Vite build — **no Node process**. Host on **Netlify** (free tier) so
+`/offering/<id>` can return HTTP 200.
 
-See **[deploy/FREE.md](./deploy/FREE.md)** (Netlify + GitHub Pages + DNS).
+See **[deploy/FREE.md](./deploy/FREE.md)** (Netlify + DNS).
 
 VPS/nginx is optional: [`deploy/nginx-danaverse.conf`](./deploy/nginx-danaverse.conf).
 

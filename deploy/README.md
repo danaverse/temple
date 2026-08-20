@@ -1,6 +1,6 @@
 # Host Temple on danaverse.org
 
-**Free (recommended):** [FREE.md](./FREE.md) — Netlify or GitHub Pages.
+**Free (recommended):** [FREE.md](./FREE.md) — Netlify.
 
 VPS/nginx (optional):
 
