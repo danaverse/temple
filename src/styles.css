@@ -1,0 +1,253 @@
+:root,
+[data-theme='wood'] {
+  --bg0: #1c120c;
+  --bg1: #120c08;
+  --ink: #f3e6d4;
+  --muted: #c4a882;
+  --accent: #d4a84b;
+  --line: rgba(212, 168, 75, 0.28);
+  --card: rgba(243, 230, 212, 0.04);
+  --surface: rgba(212, 168, 75, 0.08);
+  --btn: #d4a84b;
+  --btn-ink: #1a100c;
+  --danger: #e07a6a;
+  --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+[data-theme='dark'] {
+  --bg0: #050505;
+  --bg1: #0a0a0a;
+  --ink: #f5f5f5;
+  --muted: #a3a3a3;
+  --accent: #ffffff;
+  --line: rgba(255, 255, 255, 0.14);
+  --card: rgba(255, 255, 255, 0.04);
+  --surface: rgba(255, 255, 255, 0.06);
+  --btn: #ffffff;
+  --btn-ink: #0a0a0a;
+  color-scheme: dark;
+}
+
+[data-theme='light'] {
+  --bg0: #f3ebe0;
+  --bg1: #e8d9c4;
+  --ink: #2a2118;
+  --muted: #6b5a48;
+  --accent: #7a2e22;
+  --line: rgba(90, 60, 30, 0.2);
+  --card: rgba(90, 55, 25, 0.06);
+  --surface: rgba(90, 55, 25, 0.08);
+  --btn: #7a2e22;
+  --btn-ink: #fff8ef;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: radial-gradient(1200px 600px at 50% -10%, var(--bg1), var(--bg0));
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.app {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.25rem 1.1rem 3.5rem;
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand:hover {
+  text-decoration: none;
+}
+.brand-sub {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  margin-top: 0.15rem;
+}
+
+.langs {
+  display: flex;
+  gap: 0.35rem;
+}
+.langs button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.langs button[aria-pressed='true'] {
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+.manifesto {
+  font-family: var(--font-display);
+  font-size: 1.28rem;
+  line-height: 1.45;
+  margin: 0 0 1.5rem;
+}
+
+.search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+.search input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font: inherit;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.5rem;
+}
+.search button,
+.btn {
+  background: var(--btn);
+  color: var(--btn-ink);
+  border: 0;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.7rem 0.95rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--line);
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+.list a.row,
+.card {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  padding: 0.85rem 0.95rem;
+  color: inherit;
+  text-decoration: none;
+}
+.list a.row:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+}
+
+.row-title {
+  font-weight: 600;
+  font-size: 1.02rem;
+}
+.row-meta {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+
+.kind {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.45rem;
+}
+
+.hero-name {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0 0 0.4rem;
+}
+
+.dl {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.35rem 0.75rem;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+.dl dt {
+  color: var(--muted);
+}
+.dl dd {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.2rem 0 1.6rem;
+}
+
+.hint,
+.status {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.txid {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.error {
+  color: var(--danger);
+}

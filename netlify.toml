@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA: /offering/<id> (and /tx/<id> aliases) must return the app, not a 404.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
