@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { OfferingRows } from '../components/OfferingRows.js';
 import type { Copy, Locale } from '../i18n.js';
 import { formatCount } from '../i18n.js';
@@ -19,8 +19,14 @@ import {
   fetchIndexRecent,
   type IndexMemorialGroup,
 } from '../lib/indexApi.js';
+import {
+  applyBurnToGroup,
+  applyMemorialLive,
+  classifiedToIndexBurn,
+  memorialTouchesStar,
+} from '../lib/live.js';
 import { offeringPath } from '../lib/routes.js';
-import { useIndexPoll } from '../lib/useIndexPoll.js';
+import { useDanaLive } from '../lib/useDanaLive.js';
 
 function whenLabel(
   t: Copy,
@@ -97,6 +103,8 @@ export function TxPage(props: {
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const classifiedRef = useRef<ClassifiedTx | null>(null);
+  classifiedRef.current = classified;
 
   useEffect(() => {
     let cancelled = false;
@@ -125,20 +133,56 @@ export function TxPage(props: {
     };
   }, [txid, t.loadError]);
 
-  const silentRefresh = useCallback(async () => {
-    try {
-      const next = await loadOffering(txid);
-      setClassified(next.classified);
-      setGroup(next.group);
-      setRecent(next.recent);
-      setTokenMeta(next.tokenMeta);
-      setError(null);
-    } catch {
-      /* keep the last good page */
-    }
-  }, [txid]);
+  const onLiveTxid = useCallback(
+    async (liveTxid: string) => {
+      try {
+        const next = await fetchClassifiedTx(liveTxid);
+        if (next.txid === txid.toLowerCase()) {
+          setClassified(next);
+          classifiedRef.current = next;
+        }
+        const burn = classifiedToIndexBurn(next);
+        if (!burn) {
+          setError(null);
+          return;
+        }
 
-  useIndexPoll(silentRefresh, true);
+        setGroup(prev => {
+          const page = classifiedRef.current;
+          const pageMemorial =
+            next.txid === txid.toLowerCase() && next.kind === 'memorial'
+              ? next
+              : page?.kind === 'memorial'
+                ? page
+                : null;
+          if (!pageMemorial && !prev) return prev;
+          const starId =
+            prev?.originalBurnTxid ||
+            pageMemorial?.memorial?.parentBurnTxid ||
+            pageMemorial?.txid ||
+            '';
+          if (!starId) return prev;
+          if (!memorialTouchesStar(starId, prev, next)) return prev;
+          return applyBurnToGroup(prev, burn);
+        });
+
+        setRecent(prev => {
+          if (prev.length === 0) return prev;
+          if (!burn.tokenId) return prev;
+          if (!prev.some(g => g.burns.some(b => b.tokenId === burn.tokenId))) {
+            return prev;
+          }
+          return applyMemorialLive(prev, burn);
+        });
+        setError(null);
+      } catch {
+        /* keep the last good page */
+      }
+    },
+    [txid],
+  );
+
+  useDanaLive(onLiveTxid, true);
 
   const altar = useMemo(() => {
     const notes: string[] = [];
