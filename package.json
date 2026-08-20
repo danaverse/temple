@@ -1,7 +1,7 @@
 {
   "name": "@danaverse/temple",
   "version": "0.1.0",
-  "description": "Danaverse — giving without keeping. A public temple of names remembered and gifts given up for all.",
+  "description": "Danaverse — giving without seeking anything in return. It is about giving something up for all.",
   "private": true,
   "type": "module",
   "scripts": {
