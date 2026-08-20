@@ -28,10 +28,10 @@ The browser talks to public Chronik mirrors and to the W Lotus DANA index
 (`https://wlotus.org/index-api`, CORS is open) for recent / search / star groups.
 A single tx still decodes from Chronik if the index is down.
 
-After the first load, the home list and offering pages stay current: Chronik
-`subscribeToLokadId` on **DANA** (`44414e41`) signals mempool and confirmed
-burns, then Temple re-reads the index (with a short retry, because the index
-can lag the socket).
+After the first load, the home list and offering pages poll that same index
+every few seconds while the tab is visible (and again as soon as you come
+back to the tab). Chronik websockets are not used for live updates — they
+often fire before the index has the burn.
 
 ## Host on danaverse.org
 

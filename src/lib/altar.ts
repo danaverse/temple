@@ -229,7 +229,27 @@ export function mergeAltarFields(notes: Iterable<string>): AltarFields | null {
 
 export function remembranceLine(raw: string | null | undefined): string {
   if (!raw) return '';
-  const altar = parseAltarNote(raw);
+  const t = raw.trim();
+  if (!t) return '';
+  const altar = parseAltarNote(t);
   if (altar) return altar.note.trim();
+  return t;
+}
+
+/** Newest non-empty remembrance among latestNote, burns (newest first), then root. */
+export function latestOfferingMessage(group: {
+  latestNote?: string | null;
+  originalNote?: string | null;
+  burns?: Array<{ note?: string | null }>;
+}): string {
+  const notes = [
+    group.latestNote,
+    ...(group.burns ?? []).map(b => b.note),
+    group.originalNote,
+  ];
+  for (const raw of notes) {
+    const msg = remembranceLine(raw);
+    if (msg) return msg;
+  }
   return '';
 }

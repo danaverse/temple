@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { OfferingRows } from '../components/OfferingRows.js';
 import type { Copy, Locale } from '../i18n.js';
-import { formatCount } from '../i18n.js';
-import { memorialDisplayName } from '../lib/altar.js';
 import {
   fetchIndexRecent,
   searchIndexMemorials,
   type IndexMemorialGroup,
 } from '../lib/indexApi.js';
-import { offeringPath } from '../lib/routes.js';
-import { useDanaLiveRefresh } from '../lib/useDanaLive.js';
+import { indexListStamp } from '../lib/live.js';
+import { useIndexPoll } from '../lib/useIndexPoll.js';
 
 export function HomePage(props: {
   t: Copy;
@@ -49,14 +48,16 @@ export function HomePage(props: {
     if (searching) return;
     try {
       const list = await fetchIndexRecent(40);
-      setItems(list);
+      setItems(prev =>
+        indexListStamp(prev) === indexListStamp(list) ? prev : list,
+      );
       setError(null);
     } catch {
       /* keep the last good list */
     }
   }, [searching]);
 
-  useDanaLiveRefresh(refreshRecent, !searching);
+  useIndexPoll(refreshRecent, !searching);
 
   function onSearch(e: FormEvent) {
     e.preventDefault();
@@ -82,32 +83,13 @@ export function HomePage(props: {
       {!loading && !error && items.length === 0 ? (
         <p className="status">{t.emptyRecent}</p>
       ) : null}
-      <ul className="list" aria-live="polite">
-        {items.map(g => {
-          const name =
-            memorialDisplayName(g.originalNote, locale) || t.noName;
-          return (
-            <li key={g.originalBurnTxid}>
-              <a
-                className="row"
-                href={offeringPath(g.originalBurnTxid)}
-                onClick={e => {
-                  e.preventDefault();
-                  onOpen(offeringPath(g.originalBurnTxid));
-                }}
-              >
-                <div className="row-title">{name}</div>
-                <div className="row-meta">
-                  {formatCount(t.offerings, g.totalBurns)}
-                  {g.at
-                    ? ` · ${new Date(g.at).toLocaleString(locale)}`
-                    : ''}
-                </div>
-              </a>
-            </li>
-          );
-        })}
-      </ul>
+      <OfferingRows
+        items={items}
+        locale={locale}
+        t={t}
+        onOpen={onOpen}
+        showTime
+      />
     </main>
   );
 }

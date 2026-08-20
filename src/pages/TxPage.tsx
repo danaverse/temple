@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { OfferingRows } from '../components/OfferingRows.js';
 import type { Copy, Locale } from '../i18n.js';
 import { formatCount } from '../i18n.js';
 import {
@@ -19,7 +20,7 @@ import {
   type IndexMemorialGroup,
 } from '../lib/indexApi.js';
 import { offeringPath } from '../lib/routes.js';
-import { useDanaLiveRefresh } from '../lib/useDanaLive.js';
+import { useIndexPoll } from '../lib/useIndexPoll.js';
 
 function whenLabel(
   t: Copy,
@@ -137,7 +138,7 @@ export function TxPage(props: {
     }
   }, [txid]);
 
-  useDanaLiveRefresh(silentRefresh, true);
+  useIndexPoll(silentRefresh, true);
 
   const altar = useMemo(() => {
     const notes: string[] = [];
@@ -231,27 +232,7 @@ export function TxPage(props: {
         <p className="hint">{t.notDanaHint}</p>
         <h2>{t.recentTitle}</h2>
         {recent.length === 0 ? <p className="status">{t.emptyRecent}</p> : null}
-        <ul className="list" aria-live="polite">
-          {recent.map(g => (
-            <li key={g.originalBurnTxid}>
-              <a
-                className="row"
-                href={offeringPath(g.originalBurnTxid)}
-                onClick={e => {
-                  e.preventDefault();
-                  onOpen(offeringPath(g.originalBurnTxid));
-                }}
-              >
-                <div className="row-title">
-                  {memorialDisplayName(g.originalNote, locale) || t.noName}
-                </div>
-                <div className="row-meta">
-                  {formatCount(t.offerings, g.totalBurns)}
-                </div>
-              </a>
-            </li>
-          ))}
-        </ul>
+        <OfferingRows items={recent} locale={locale} t={t} onOpen={onOpen} />
         <p className="txid">{txid}</p>
       </main>
     );

@@ -12,7 +12,7 @@ const PARENT =
   '7ab478bcfddf6eb5130d33395846012c20b92ac48f19025ef8d53ba3d7d5e359';
 
 describe('DANA memorial', () => {
-  it('exposes DANA as Chronik lokad hex', () => {
+  it('exposes DANA as lowercase lokad hex', () => {
     expect(DANA_LOKAD_HEX).toBe('44414e41');
   });
 
