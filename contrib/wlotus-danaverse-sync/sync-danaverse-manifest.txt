@@ -1,0 +1,25 @@
+# Minimal public mirror: bcProFoundation/wlotus → danaverse/wlotus
+# One path per line (file or directory). Lines starting with # are ignored.
+
+# Production covenant (Spedn)
+contracts/WlotusPowRemintMooreTipTemple.spedn
+contracts/WlotusPowRemintMooreTip.spedn
+contracts/WlotusPowRemintMoore.spedn
+
+# Covenant loaders + consensus params (reference)
+src/covenant
+src/params/wlotusMint.ts
+src/params/consensus.ts
+src/params/specialCountries.ts
+
+# DANA memorial wire (Temple / danaverse.org decode the same payloads)
+src/offering
+
+# Explorer URL helpers referenced by apps/web
+src/explorer.ts
+
+# Offerings web app (reference — not deployed from this repo)
+apps/web
+
+# Legal
+LICENSE

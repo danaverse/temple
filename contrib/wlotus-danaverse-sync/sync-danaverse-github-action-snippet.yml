@@ -1,0 +1,30 @@
+# Add to `.github/workflows/deploy-web-prod.yml` after the deploy job succeeds.
+#
+# Requires GitHub secret:
+#   DANAVERSE_WLOTUS_SYNC_TOKEN — fine-grained PAT with Contents: Read+Write on danaverse/wlotus only
+#
+# Or use a deploy key (read/write) on danaverse/wlotus and set DANAVERSE_WLOTUS_DEPLOY_KEY.
+
+  sync-danaverse:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Checkout (same ref as prod deploy)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Push public mirror to danaverse/wlotus
+        env:
+          DANAVERSE_WLOTUS_SYNC_TOKEN: ${{ secrets.DANAVERSE_WLOTUS_SYNC_TOKEN }}
+        run: |
+          if [ -z "${DANAVERSE_WLOTUS_SYNC_TOKEN:-}" ]; then
+            echo "DANAVERSE_WLOTUS_SYNC_TOKEN not set — skip mirror sync"
+            exit 0
+          fi
+          REF="${GITHUB_REF_NAME}"
+          chmod +x scripts/sync-to-danaverse.sh
+          git config --global url."https://x-access-token:${DANAVERSE_WLOTUS_SYNC_TOKEN}@github.com/".insteadOf "https://github.com/"
+          ./scripts/sync-to-danaverse.sh "$REF"
