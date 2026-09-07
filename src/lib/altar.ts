@@ -175,6 +175,90 @@ export function altarBareNameFromNote(raw: string): string {
   return t;
 }
 
+export function normalizeAltarSearchText(raw: string): string {
+  return raw
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .trim();
+}
+
+const SEARCH_HONORIFIC_TOKENS = new Set([
+  'ong',
+  'ba',
+  'mr',
+  'mrs',
+  'mister',
+  'missus',
+  '先生',
+  '女士',
+]);
+
+export function altarSearchTokens(raw: string): string[] {
+  return normalizeAltarSearchText(raw)
+    .replace(/[.]/g, ' ')
+    .split(/[^\p{L}\p{N}]+/u)
+    .map(t => t.trim())
+    .filter(t => t.length > 0 && !SEARCH_HONORIFIC_TOKENS.has(t));
+}
+
+function tokenSubsequenceScore(
+  nameTokens: string[],
+  queryTokens: string[],
+): number {
+  if (!queryTokens.length || !nameTokens.length) return 0;
+  let i = 0;
+  const at: number[] = [];
+  for (const qt of queryTokens) {
+    let found = -1;
+    for (let j = i; j < nameTokens.length; j++) {
+      if (nameTokens[j]!.startsWith(qt)) {
+        found = j;
+        break;
+      }
+    }
+    if (found < 0) return 0;
+    at.push(found);
+    i = found + 1;
+  }
+  if (
+    queryTokens.length === nameTokens.length &&
+    queryTokens.every((t, idx) => nameTokens[idx] === t)
+  ) {
+    return 3;
+  }
+  if (at[0] === 0) return 2;
+  return 1;
+}
+
+/** Exact 3 / prefix 2 / contains-or-skipped-middle 1 / none 0. */
+export function altarSearchRelevance(
+  name: string,
+  query: string,
+  bareName?: string,
+): number {
+  const queryTokens = altarSearchTokens(query);
+  if (!queryTokens.length) return 0;
+  const qHay = queryTokens.join(' ');
+
+  const score = (raw: string): number => {
+    const nameTokens = altarSearchTokens(raw);
+    if (!nameTokens.length) return 0;
+    const nHay = nameTokens.join(' ');
+    let best = 0;
+    if (nHay === qHay) best = 3;
+    else if (nHay.startsWith(qHay)) best = 2;
+    else if (nHay.includes(qHay)) best = 1;
+    return Math.max(best, tokenSubsequenceScore(nameTokens, queryTokens));
+  };
+
+  let best = score(name);
+  const bare = bareName?.trim();
+  if (bare) best = Math.max(best, score(bare));
+  return best;
+}
+
 export function mergeAltarFields(notes: Iterable<string>): AltarFields | null {
   const list = [...notes];
   let merged: AltarFields | null = null;

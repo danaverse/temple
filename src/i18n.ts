@@ -11,6 +11,8 @@ export interface Copy {
   manifesto: string;
   searchPlaceholder: string;
   searchSubmit: string;
+  searchResultsTitle: string;
+  searchEmpty: string;
   recentTitle: string;
   emptyRecent: string;
   loadError: string;
@@ -51,6 +53,8 @@ export const MESSAGES: Record<Locale, Copy> = {
       'Đốt tiền với thiện ý là hành vi lạ lùng nhất trong lịch sử loài người — một người tự nguyện giảm của cải của mình vì cộng đồng. Hành vi ấy bắt nguồn từ tấm lòng và niềm tin vào những người khác.',
     searchPlaceholder: 'Tìm theo tên tưởng nhớ…',
     searchSubmit: 'Tìm',
+    searchResultsTitle: 'Kết quả tìm kiếm',
+    searchEmpty: 'Không tìm thấy tên này.',
     recentTitle: 'Dâng gần đây',
     emptyRecent: 'Chưa có dâng hoa được ghi.',
     loadError: 'Không tải được sổ. Thử lại sau.',
@@ -91,6 +95,8 @@ export const MESSAGES: Record<Locale, Copy> = {
       'To burn money with good intention is the strangest behavior in humanity’s history — an individual choosing to lessen their property for the community. That act roots in a good heart and faith in other people.',
     searchPlaceholder: 'Search a remembered name…',
     searchSubmit: 'Search',
+    searchResultsTitle: 'Search results',
+    searchEmpty: 'No matching names.',
     recentTitle: 'Recent offerings',
     emptyRecent: 'No offerings recorded yet.',
     loadError: 'Could not load the ledger. Try again shortly.',
@@ -131,6 +137,8 @@ export const MESSAGES: Record<Locale, Copy> = {
       '怀着善意烧掉钱，是人类史上最奇特的行为——一个人自愿减损自己的财产，成全共同体。这源于善心，以及对他人的信任。',
     searchPlaceholder: '按纪念姓名搜索…',
     searchSubmit: '搜索',
+    searchResultsTitle: '搜索结果',
+    searchEmpty: '没有找到这个名字。',
     recentTitle: '近期供奉',
     emptyRecent: '尚无供奉记录。',
     loadError: '无法打开簿册，请稍后再试。',

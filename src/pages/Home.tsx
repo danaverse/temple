@@ -25,29 +25,37 @@ export function HomePage(props: {
   const [items, setItems] = useState<IndexMemorialGroup[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const searching = Boolean(props.initialQuery.trim());
+  const searching = q.trim().length > 0;
+
+  useEffect(() => {
+    setQ(props.initialQuery);
+  }, [props.initialQuery]);
 
   useEffect(() => {
     let cancelled = false;
-    const run = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const list = searching
-          ? await searchIndexMemorials(props.initialQuery, 30)
-          : await fetchIndexRecent(40);
-        if (!cancelled) setItems(list);
-      } catch {
-        if (!cancelled) setError(t.loadError);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-    void run();
+    const query = q.trim();
+    const delay = query ? 280 : 0;
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const list = query
+            ? await searchIndexMemorials(query, 30)
+            : await fetchIndexRecent(40);
+          if (!cancelled) setItems(list);
+        } catch {
+          if (!cancelled) setError(t.loadError);
+        } finally {
+          if (!cancelled) setLoading(false);
+        }
+      })();
+    }, delay);
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
-  }, [props.initialQuery, searching, t.loadError]);
+  }, [q, t.loadError]);
 
   const onLiveTxid = useCallback(async (txid: string) => {
     if (searching) return;
@@ -78,6 +86,7 @@ export function HomePage(props: {
       <p className="manifesto">{t.manifesto}</p>
       <form className="search" onSubmit={onSearch}>
         <input
+          type="search"
           value={q}
           onChange={e => setQ(e.target.value)}
           placeholder={t.searchPlaceholder}
@@ -85,11 +94,11 @@ export function HomePage(props: {
         />
         <button type="submit">{t.searchSubmit}</button>
       </form>
-      <h2>{t.recentTitle}</h2>
+      <h2>{searching ? t.searchResultsTitle : t.recentTitle}</h2>
       {loading ? <p className="status">{t.loading}</p> : null}
       {error ? <p className="error">{error}</p> : null}
       {!loading && !error && items.length === 0 ? (
-        <p className="status">{t.emptyRecent}</p>
+        <p className="status">{searching ? t.searchEmpty : t.emptyRecent}</p>
       ) : null}
       <OfferingRows
         items={items}

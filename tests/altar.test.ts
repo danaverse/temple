@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ALTAR_SEP, latestOfferingMessage, memorialDisplayName, parseAltarNote, remembranceLine } from '../src/lib/altar.js';
+import { ALTAR_SEP, altarSearchRelevance, latestOfferingMessage, memorialDisplayName, parseAltarNote, remembranceLine } from '../src/lib/altar.js';
 
 describe('altar note decode', () => {
   it('reads packed title-first wire (explorer.e.cash would show raw bytes)', () => {
@@ -42,5 +42,12 @@ describe('altar note decode', () => {
         burns: [{ note: packed }],
       }),
     ).toBe('Cúng Cô Hồn');
+  });
+
+  it('matches family + given when a middle name is skipped', () => {
+    expect(altarSearchRelevance('Cao Lâm Quả', 'Cao Quả')).toBe(2);
+    expect(altarSearchRelevance('Ông Cao Lâm Quả', 'cao qua')).toBe(2);
+    expect(altarSearchRelevance('Nguyễn Thị Mân', 'nguyen man')).toBe(2);
+    expect(altarSearchRelevance('Ông Cao Lâm Quả', 'ông')).toBe(0);
   });
 });
