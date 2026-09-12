@@ -300,7 +300,16 @@ export function TxPage(props: {
         <p className="hint">{remembranceLine(classified.memorial.note) || classified.memorial.note}</p>
       ) : null}
       <p className="row-meta">
-        {formatCount(t.offerings, group?.totalBurns || burns.length || 1)}
+        <span className="dana-count">
+          <img
+            src="/dana.png"
+            className="dana-count-logo"
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+          />
+          {formatCount(t.dana, group?.totalBurns || burns.length || 1)}
+        </span>
         {' · '}
         {whenLabel(
           t,

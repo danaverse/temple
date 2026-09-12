@@ -21,7 +21,8 @@ export interface Copy {
   memorialKind: string;
   remintKind: string;
   genesisKind: string;
-  offerings: string;
+  /** Burned WLOTUS and PAW are all dana — the count label never names a token. */
+  dana: string;
   remembrance: string;
   birth: string;
   death: string;
@@ -65,7 +66,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     memorialKind: 'Dâng hoa tưởng nhớ',
     remintKind: 'Sen nở lại',
     genesisKind: 'Gốc token',
-    offerings: '{n} lần dâng',
+    dana: '{n} dana',
     remembrance: 'Lời tưởng nhớ',
     birth: 'Sinh',
     death: 'Mất',
@@ -106,7 +107,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     memorialKind: 'Memorial offering',
     remintKind: 'Lotus remint',
     genesisKind: 'Lotus origin',
-    offerings: '{n} offerings',
+    dana: '{n} dana',
     remembrance: 'Remembrance',
     birth: 'Born',
     death: 'Died',
@@ -147,7 +148,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     memorialKind: '纪念供奉',
     remintKind: '莲花再铸',
     genesisKind: '莲花源起',
-    offerings: '{n} 次供奉',
+    dana: '{n} dana',
     remembrance: '追思',
     birth: '生',
     death: '卒',

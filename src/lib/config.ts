@@ -5,6 +5,7 @@ export const DEFAULT_CHRONIK_URLS = [
 ] as const;
 
 export const DEFAULT_DANA_INDEX_BASE = 'https://wlotus.org/index-api';
+export const DEFAULT_PAW_INDEX_BASE = 'https://onest.pet/index-api';
 export const DEFAULT_OFFER_ORIGIN = 'https://wlotus.org';
 export const DEFAULT_SITE_ORIGIN = 'https://danaverse.org';
 
@@ -29,6 +30,10 @@ export function chronikUrls(): string[] {
 
 export const DANA_INDEX_BASE =
   viteEnv('VITE_DANA_INDEX_BASE') || DEFAULT_DANA_INDEX_BASE;
+
+/** onest.pet PAW memorials — same DANA wire, different index shape. */
+export const PAW_INDEX_BASE =
+  viteEnv('VITE_PAW_INDEX_BASE') || DEFAULT_PAW_INDEX_BASE;
 
 export const OFFER_ORIGIN = (
   viteEnv('VITE_OFFER_ORIGIN') || DEFAULT_OFFER_ORIGIN

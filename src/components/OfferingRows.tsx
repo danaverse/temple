@@ -31,7 +31,16 @@ export function OfferingRows(props: {
               <div className="row-title">{name}</div>
               {showMessage ? <div className="row-note">{lastMessage}</div> : null}
               <div className="row-meta">
-                {formatCount(t.offerings, g.totalBurns)}
+                <span className="dana-count">
+                  <img
+                    src="/dana.png"
+                    className="dana-count-logo"
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                  />
+                  {formatCount(t.dana, g.totalBurns)}
+                </span>
                 {showTime && g.at
                   ? ` · ${new Date(g.at).toLocaleString(locale)}`
                   : ''}
