@@ -1,6 +1,12 @@
 /**
  * Read-only altar note packing (Unit Separator U+001F).
  * Same field order as wLotus `docs/ALTAR.md`.
+ *
+ * onest.pet (PAW) packs pet memorials in its own 12-slot order instead:
+ * species | name | note | breed | birthDate | passingDate | location
+ *   | memorialPlace | relationshipType | relatedTxid | kind | dateCalendar
+ * with kind `memorial`. Parsed into the same fields below (plus species /
+ * breed) so the ledger renders both.
  */
 
 export const ALTAR_SEP = '\u001f';
@@ -26,6 +32,10 @@ export interface AltarFields {
   relationshipType: AltarRelationshipType;
   relatedTxid: string;
   relationships: AltarRelationshipLink[];
+  /** onest.pet only: dog | cat | bird | rabbit | horse | other. */
+  species: string;
+  /** onest.pet only: free-text breed / description. */
+  breed: string;
 }
 
 export function emptyAltarFields(): AltarFields {
@@ -41,6 +51,8 @@ export function emptyAltarFields(): AltarFields {
     relationshipType: '',
     relatedTxid: '',
     relationships: [],
+    species: '',
+    breed: '',
   };
 }
 
@@ -90,11 +102,79 @@ function isTitleFirstWire(parts: string[]): boolean {
   return raw0 === '' && parts.length >= 2;
 }
 
+/** onest.pet kind slot for a pet memorial profile (wLotus never writes it). */
+function isPetKindWire(parts: string[]): boolean {
+  return (parts[10] ?? '').trim().toLowerCase() === 'memorial';
+}
+
+export type PetSpecies = '' | 'dog' | 'cat' | 'bird' | 'rabbit' | 'horse' | 'other';
+
+export function normalizePetSpecies(
+  raw: string | null | undefined,
+): PetSpecies {
+  const t = (raw || '').trim().toLowerCase();
+  if (
+    t === 'dog' ||
+    t === 'cat' ||
+    t === 'bird' ||
+    t === 'rabbit' ||
+    t === 'horse' ||
+    t === 'other'
+  ) {
+    return t;
+  }
+  return '';
+}
+
+const PET_SPECIES_EMOJI: Record<Exclude<PetSpecies, ''>, string> = {
+  dog: '🐕',
+  cat: '🐈',
+  bird: '🦜',
+  rabbit: '🐇',
+  horse: '🐴',
+  other: '🐾',
+};
+
+/** Localized species with its paw mark — unknown codes show as written. */
+export function petSpeciesLabel(
+  raw: string | null | undefined,
+  locale: Locale = 'vi',
+): string {
+  const t = (raw || '').trim();
+  if (!t) return '';
+  const key = normalizePetSpecies(t);
+  const emoji = key ? PET_SPECIES_EMOJI[key] : '🐾';
+  const name = !key
+    ? t
+    : locale === 'en'
+      ? { dog: 'Dog', cat: 'Cat', bird: 'Bird', rabbit: 'Rabbit', horse: 'Horse', other: 'Other' }[key]
+      : locale === 'zh'
+        ? { dog: '狗', cat: '猫', bird: '鸟', rabbit: '兔子', horse: '马', other: '其他' }[key]
+        : { dog: 'Chó', cat: 'Mèo', bird: 'Chim', rabbit: 'Thỏ', horse: 'Ngựa', other: 'Khác' }[key];
+  return `${emoji} ${name}`;
+}
+
 export function parseAltarNote(raw: string): AltarFields | null {
   if (!isAltarPackedNote(raw)) return null;
   const parts = raw.split(ALTAR_SEP);
   let fields: AltarFields;
-  if (isTitleFirstWire(parts)) {
+  if (isPetKindWire(parts)) {
+    fields = {
+      title: '',
+      species: (parts[0] ?? '').trim(),
+      name: (parts[1] ?? '').trim(),
+      note: (parts[2] ?? '').trim(),
+      breed: (parts[3] ?? '').trim(),
+      birthYear: (parts[4] ?? '').trim(),
+      deathDate: (parts[5] ?? '').trim(),
+      birthPlace: (parts[6] ?? '').trim(),
+      deathPlace: '',
+      funeralPlace: (parts[7] ?? '').trim(),
+      relationshipType: normalizeAltarRelationshipType(parts[8]),
+      relatedTxid: normalizeAltarRelatedTxid(parts[9]),
+      relationships: [],
+    };
+  } else if (isTitleFirstWire(parts)) {
     fields = {
       title: normalizeAltarHonorific(parts[0]),
       name: (parts[1] ?? '').trim(),
@@ -107,6 +187,8 @@ export function parseAltarNote(raw: string): AltarFields | null {
       relationshipType: normalizeAltarRelationshipType(parts[8]),
       relatedTxid: normalizeAltarRelatedTxid(parts[9]),
       relationships: [],
+      species: '',
+      breed: '',
     };
   } else {
     fields = {
@@ -121,6 +203,8 @@ export function parseAltarNote(raw: string): AltarFields | null {
       relationshipType: normalizeAltarRelationshipType(parts[7]),
       relatedTxid: normalizeAltarRelatedTxid(parts[8]),
       relationships: [],
+      species: '',
+      breed: '',
     };
   }
   fields.relationships = linksFromSingular(
@@ -286,6 +370,8 @@ export function mergeAltarFields(notes: Iterable<string>): AltarFields | null {
       relationshipType: '',
       relatedTxid: '',
       relationships: [],
+      species: merged.species || parsed.species,
+      breed: merged.breed || parsed.breed,
     };
   }
   if (!merged) return null;

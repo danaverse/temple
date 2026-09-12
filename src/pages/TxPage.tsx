@@ -7,6 +7,7 @@ import {
   memorialDisplayName,
   mergeAltarFields,
   parseAltarNote,
+  petSpeciesLabel,
   remembranceLine,
   type AltarFields,
 } from '../lib/altar.js';
@@ -39,9 +40,12 @@ function whenLabel(
   return t.unconfirmed;
 }
 
-function AltarDl(props: { t: Copy; altar: AltarFields }) {
-  const { t, altar } = props;
+function AltarDl(props: { t: Copy; locale: Locale; altar: AltarFields }) {
+  const { t, locale, altar } = props;
   const rows: Array<[string, string]> = [];
+  const species = petSpeciesLabel(altar.species, locale);
+  if (species) rows.push([t.species, species]);
+  if (altar.breed) rows.push([t.breed, altar.breed]);
   if (altar.note) rows.push([t.remembrance, altar.note]);
   if (altar.birthYear) rows.push([t.birth, altar.birthYear]);
   if (altar.birthPlace) rows.push([t.birthPlace, altar.birthPlace]);
@@ -296,7 +300,7 @@ export function TxPage(props: {
     <main>
       <div className="kind">{t.memorialKind}</div>
       <h1 className="hero-name">{titleName || t.noName}</h1>
-      {packed ? <AltarDl t={t} altar={packed} /> : null}
+      {packed ? <AltarDl t={t} locale={locale} altar={packed} /> : null}
       {!packed && classified.memorial?.note ? (
         <p className="hint">{remembranceLine(classified.memorial.note) || classified.memorial.note}</p>
       ) : null}
