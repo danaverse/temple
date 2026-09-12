@@ -227,6 +227,20 @@ h2 {
   margin-top: 0.2rem;
 }
 
+/** Burned WLOTUS and PAW are all dana — one mark for the count. */
+.dana-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  white-space: nowrap;
+}
+.dana-count-logo {
+  width: 1.05rem;
+  height: 1.05rem;
+  object-fit: contain;
+  filter: var(--brand-logo-filter, none);
+}
+
 .kind {
   display: inline-block;
   font-size: 0.72rem;

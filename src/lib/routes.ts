@@ -57,3 +57,19 @@ export function canonicalPath(route: Route): string {
   }
   return offeringPath(route.txid);
 }
+
+/**
+ * True when a star belongs to onest.pet (PAW `offeringId`), so outbound
+ * links go to onest.pet instead of wlotus.org. Checks the decoded memorial
+ * first, then the indexed burns (a star page can load from the index while
+ * Chronik has not seen the tx yet).
+ */
+export function isOnestStar(
+  memorialOfferingId: string | null | undefined,
+  burns?: Array<{ offeringId?: string | null }>,
+): boolean {
+  if ((memorialOfferingId || '').trim().toLowerCase() === 'paw') return true;
+  return (burns ?? []).some(
+    b => (b.offeringId || '').trim().toLowerCase() === 'paw',
+  );
+}

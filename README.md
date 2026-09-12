@@ -1,6 +1,7 @@
 # Temple — Dana explorer
 
-Public ledger for **DANA** records (wLotus memorial burns and lotus remints).
+Public ledger for **DANA** records (memorial burns and lotus remints —
+W Lotus **WLOTUS** and onest.pet **PAW** alike; burned tokens are all dana).
 
 Host it at **[danaverse.org](https://danaverse.org)**. App links from W Lotus should
 open here instead of [explorer.e.cash](https://explorer.e.cash).
@@ -24,9 +25,11 @@ npm test
 npm run dev    # http://127.0.0.1:5174
 ```
 
-The browser talks to public Chronik mirrors and to the W Lotus DANA index
-(`https://wlotus.org/index-api`, CORS is open) for recent / search / star groups.
-A single tx still decodes from Chronik if the index is down.
+The browser talks to public Chronik mirrors and to two DANA indexes
+(`https://wlotus.org/index-api` and `https://onest.pet/index-api`, CORS is open)
+for recent / search / star groups. The lists are merged — WLOTUS and PAW burns
+side by side, counted as dana. A single tx still decodes from Chronik if the
+index is down.
 
 After the first load, live updates come from Chronik
 (`subscribeToLokadId` on DANA). New burns are decoded and merged into the
@@ -47,8 +50,10 @@ Optional env (bake at build time):
 | Var | Default | Meaning |
 |-----|---------|---------|
 | `VITE_CHRONIK_URLS` | public Chronik mirrors | Comma-separated |
-| `VITE_DANA_INDEX_BASE` | `https://wlotus.org/index-api` | Recent / search / star groups |
-| `VITE_OFFER_ORIGIN` | `https://wlotus.org` | “Offer a lotus” deep links |
+| `VITE_DANA_INDEX_BASE` | `https://wlotus.org/index-api` | WLOTUS recent / search / star groups |
+| `VITE_PAW_INDEX_BASE` | `https://onest.pet/index-api` | PAW (onest.pet) recent / search / star groups |
+| `VITE_OFFER_ORIGIN` | `https://wlotus.org` | “Offer a lotus” deep links (PAW stars link to onest.pet instead) |
+| `VITE_ONEST_ORIGIN` | `https://onest.pet` | Outbound links for onest.pet (PAW) memorials |
 | `VITE_PUBLIC_SITE_ORIGIN` | `https://danaverse.org` | Canonical origin |
 
 ## Wire (what we decode)

@@ -21,7 +21,8 @@ export interface Copy {
   memorialKind: string;
   remintKind: string;
   genesisKind: string;
-  offerings: string;
+  /** Burned WLOTUS and PAW are all dana — the count label never names a token. */
+  dana: string;
   remembrance: string;
   birth: string;
   death: string;
@@ -30,6 +31,7 @@ export interface Copy {
   funeralPlace: string;
   related: string;
   offerLotus: string;
+  openOnest: string;
   recorded: string;
   unconfirmed: string;
   lotusRemint: string;
@@ -65,7 +67,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     memorialKind: 'Dâng hoa tưởng nhớ',
     remintKind: 'Sen nở lại',
     genesisKind: 'Gốc token',
-    offerings: '{n} lần dâng',
+    dana: '{n} dana',
     remembrance: 'Lời tưởng nhớ',
     birth: 'Sinh',
     death: 'Mất',
@@ -74,6 +76,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     funeralPlace: 'Nơi an nghỉ',
     related: 'Liên hệ',
     offerLotus: 'Dâng sen trên W Lotus',
+    openOnest: 'Mở trên onest.pet',
     recorded: 'Ghi lúc',
     unconfirmed: 'Đang ghi',
     lotusRemint: 'Một đóa sen được nở lại bằng công PoW — không phải chuyển khoản.',
@@ -106,7 +109,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     memorialKind: 'Memorial offering',
     remintKind: 'Lotus remint',
     genesisKind: 'Lotus origin',
-    offerings: '{n} offerings',
+    dana: '{n} dana',
     remembrance: 'Remembrance',
     birth: 'Born',
     death: 'Died',
@@ -115,6 +118,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     funeralPlace: 'Resting place',
     related: 'Related',
     offerLotus: 'Offer a lotus on W Lotus',
+    openOnest: 'Open on onest.pet',
     recorded: 'Recorded',
     unconfirmed: 'Pending',
     lotusRemint:
@@ -147,7 +151,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     memorialKind: '纪念供奉',
     remintKind: '莲花再铸',
     genesisKind: '莲花源起',
-    offerings: '{n} 次供奉',
+    dana: '{n} dana',
     remembrance: '追思',
     birth: '生',
     death: '卒',
@@ -156,6 +160,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     funeralPlace: '安息处',
     related: '关系',
     offerLotus: '在 W Lotus 献莲',
+    openOnest: '在 onest.pet 打开',
     recorded: '记录于',
     unconfirmed: '待确认',
     lotusRemint: '一朵莲花经工作量证明再铸——不是转账。',

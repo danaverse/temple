@@ -13,7 +13,7 @@ import {
 import { fetchClassifiedTx, fetchTokenInfo } from '../lib/chronik.js';
 import type { ClassifiedTx } from '../lib/classify.js';
 import { shortTx } from '../lib/classify.js';
-import { offerUrl } from '../lib/config.js';
+import { offerUrl, onestUrl } from '../lib/config.js';
 import {
   fetchIndexMemorial,
   fetchIndexRecent,
@@ -25,7 +25,7 @@ import {
   classifiedToIndexBurn,
   memorialTouchesStar,
 } from '../lib/live.js';
-import { offeringPath } from '../lib/routes.js';
+import { isOnestStar, offeringPath } from '../lib/routes.js';
 import { useDanaLive } from '../lib/useDanaLive.js';
 
 function whenLabel(
@@ -290,6 +290,7 @@ export function TxPage(props: {
     classified.memorial?.parentBurnTxid ||
     classified.txid;
   const burns = group?.burns ?? [];
+  const onest = isOnestStar(classified.memorial?.offeringId, burns);
 
   return (
     <main>
@@ -300,7 +301,16 @@ export function TxPage(props: {
         <p className="hint">{remembranceLine(classified.memorial.note) || classified.memorial.note}</p>
       ) : null}
       <p className="row-meta">
-        {formatCount(t.offerings, group?.totalBurns || burns.length || 1)}
+        <span className="dana-count">
+          <img
+            src="/dana.png"
+            className="dana-count-logo"
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+          />
+          {formatCount(t.dana, group?.totalBurns || burns.length || 1)}
+        </span>
         {' · '}
         {whenLabel(
           t,
@@ -310,9 +320,15 @@ export function TxPage(props: {
         )}
       </p>
       <div className="actions">
-        <a className="btn" href={offerUrl(starId)}>
-          {t.offerLotus}
-        </a>
+        {onest ? (
+          <a className="btn" href={onestUrl(starId)}>
+            {t.openOnest}
+          </a>
+        ) : (
+          <a className="btn" href={offerUrl(starId)}>
+            {t.offerLotus}
+          </a>
+        )}
       </div>
       {burns.length > 0 ? (
         <>
