@@ -31,6 +31,7 @@ export interface Copy {
   funeralPlace: string;
   related: string;
   offerLotus: string;
+  openOnest: string;
   recorded: string;
   unconfirmed: string;
   lotusRemint: string;
@@ -75,6 +76,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     funeralPlace: 'Nơi an nghỉ',
     related: 'Liên hệ',
     offerLotus: 'Dâng sen trên W Lotus',
+    openOnest: 'Mở trên onest.pet',
     recorded: 'Ghi lúc',
     unconfirmed: 'Đang ghi',
     lotusRemint: 'Một đóa sen được nở lại bằng công PoW — không phải chuyển khoản.',
@@ -116,6 +118,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     funeralPlace: 'Resting place',
     related: 'Related',
     offerLotus: 'Offer a lotus on W Lotus',
+    openOnest: 'Open on onest.pet',
     recorded: 'Recorded',
     unconfirmed: 'Pending',
     lotusRemint:
@@ -157,6 +160,7 @@ export const MESSAGES: Record<Locale, Copy> = {
     funeralPlace: '安息处',
     related: '关系',
     offerLotus: '在 W Lotus 献莲',
+    openOnest: '在 onest.pet 打开',
     recorded: '记录于',
     unconfirmed: '待确认',
     lotusRemint: '一朵莲花经工作量证明再铸——不是转账。',

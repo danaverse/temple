@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   canonicalPath,
+  isOnestStar,
   offeringPath,
   parseRoute,
 } from '../src/lib/routes.js';
@@ -32,5 +33,14 @@ describe('routes', () => {
       page: 'offering',
       txid: ID,
     });
+  });
+
+  it('sends PAW stars to onest.pet, WLOTUS stars to wlotus.org', () => {
+    expect(isOnestStar('paw', [])).toBe(true);
+    expect(isOnestStar('PAW', [])).toBe(true);
+    expect(isOnestStar('wlotus', [])).toBe(false);
+    expect(isOnestStar(undefined, [{ offeringId: 'paw' }])).toBe(true);
+    expect(isOnestStar(undefined, [{ offeringId: 'wlotus' }])).toBe(false);
+    expect(isOnestStar(undefined, [])).toBe(false);
   });
 });

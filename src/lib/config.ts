@@ -7,6 +7,7 @@ export const DEFAULT_CHRONIK_URLS = [
 export const DEFAULT_DANA_INDEX_BASE = 'https://wlotus.org/index-api';
 export const DEFAULT_PAW_INDEX_BASE = 'https://onest.pet/index-api';
 export const DEFAULT_OFFER_ORIGIN = 'https://wlotus.org';
+export const DEFAULT_ONEST_ORIGIN = 'https://onest.pet';
 export const DEFAULT_SITE_ORIGIN = 'https://danaverse.org';
 
 function viteEnv(name: string): string | undefined {
@@ -46,4 +47,14 @@ export const SITE_ORIGIN = (
 export function offerUrl(burnTxid?: string): string {
   if (!burnTxid) return OFFER_ORIGIN;
   return `${OFFER_ORIGIN}/${burnTxid.trim().toLowerCase()}`;
+}
+
+export const ONEST_ORIGIN = (
+  viteEnv('VITE_ONEST_ORIGIN') || DEFAULT_ONEST_ORIGIN
+).replace(/\/$/, '');
+
+/** onest.pet profiles live at /offering/<txid>, same convention as Temple. */
+export function onestUrl(burnTxid?: string): string {
+  if (!burnTxid) return ONEST_ORIGIN;
+  return `${ONEST_ORIGIN}/offering/${burnTxid.trim().toLowerCase()}`;
 }

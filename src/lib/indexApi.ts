@@ -70,6 +70,13 @@ function isGroupShape(v: unknown): v is IndexMemorialGroup {
   );
 }
 
+/** onest.pet serves counts as strings — coerce so ranking stays numeric. */
+function withNumericCounts(g: IndexMemorialGroup): IndexMemorialGroup {
+  const n = Number((g as { totalBurns?: unknown }).totalBurns);
+  if (Number.isFinite(n)) return { ...g, totalBurns: n };
+  return { ...g, totalBurns: g.burns.length };
+}
+
 /**
  * onest.pet `/api/recent` returns flat burns (`{ ok, burns }`), not grouped
  * stars. Fold them into MemorialGroups the same way dana-index does.
@@ -167,7 +174,7 @@ async function fetchRecentFrom(base: string, limit: number): Promise<IndexMemori
   }
   // dana-index shape: { items: MemorialGroup[] }
   if (Array.isArray(body.items)) {
-    return body.items.filter(isGroupShape);
+    return body.items.filter(isGroupShape).map(withNumericCounts);
   }
   // onest.pet shape: { burns: IndexBurn[] }
   if (Array.isArray(body.burns)) {
@@ -204,9 +211,9 @@ export async function fetchIndexMemorial(
       if (!res.ok || body.ok === false) continue;
       // onest.pet shape: { memory: MemorialGroup }.
       const memory = (body as { memory?: unknown }).memory;
-      if (isGroupShape(memory)) return memory;
+      if (isGroupShape(memory)) return withNumericCounts(memory);
       // dana-index shape: group fields spread on the body.
-      if (isGroupShape(body)) return body;
+      if (isGroupShape(body)) return withNumericCounts(body);
     } catch {
       /* try the next index */
     }
@@ -235,7 +242,7 @@ async function searchFrom(
       ? body.results
       : null;
   if (!list) return null;
-  return list.filter(isGroupShape);
+  return list.filter(isGroupShape).map(withNumericCounts);
 }
 
 export async function searchIndexMemorials(

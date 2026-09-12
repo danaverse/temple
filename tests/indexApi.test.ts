@@ -153,6 +153,25 @@ describe('multi-source index (WLOTUS + onest.pet PAW)', () => {
     expect(rows.map(g => g.originalBurnTxid)).toEqual([PAW_ROOT]);
   });
 
+  it('coerces onest string counts to numbers', async () => {
+    stubFetch(url => {
+      if (url.includes('/api/search')) {
+        if (isWlotus(url)) return jsonResponse({ ok: true, items: [] });
+        return jsonResponse({
+          ok: true,
+          results: [
+            { ...group({ originalBurnTxid: PAW_ROOT, originalNote: 'Laika' }), totalBurns: '1', totalPaw: '6' },
+          ],
+        });
+      }
+      if (url.includes('/api/recent')) return jsonResponse({ ok: true, items: [] });
+      throw new Error(`unexpected fetch ${url}`);
+    });
+
+    const rows = await searchIndexMemorials('laika', 10);
+    expect(rows[0]?.totalBurns).toBe(1);
+  });
+
   it('falls back to the onest `memory` when wlotus has no star', async () => {
     const memory = group({ originalBurnTxid: PAW_ROOT, originalNote: 'Laika' });
     stubFetch(url => {
