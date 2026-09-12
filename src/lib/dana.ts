@@ -1,9 +1,11 @@
 /**
- * DANA LOKAD payloads (same wire as wLotus).
+ * DANA LOKAD payloads (same wire as wLotus; v5 adds the onest.pet creator).
  *
  * Memorial:
  *   v1: DANA | ver=1 | idLen | id | noteLen | note
  *   v2: … | parentLen | parentTxid (0 or 32 bytes)
+ *   v5: DANA | ver=5 | idLen | id | noteLen | note | creatorHash160 (20 bytes)
+ *       | parentLen | parentTxid (0 or 32 bytes)
  * Tip (remint ad):
  *   v4: DANA | ver=4 | bits u16 LE | extraBits u32 LE | locktime u32 LE  (15 bytes)
  */
@@ -15,6 +17,8 @@ export const DANA_LOKAD = new TextEncoder().encode('DANA');
 export const DANA_LOKAD_HEX = bytesToHex(DANA_LOKAD);
 export const DANA_VERSION = 1;
 export const DANA_VERSION_PARENT = 2;
+export const DANA_VERSION_PAW = 5;
+export const DANA_CREATOR_HASH_LEN = 20;
 export const DANA_TIP_VERSION = 4;
 export const DANA_PARENT_TXID_LEN = 32;
 export const DANA_TIP_LEN = 15;
@@ -24,6 +28,8 @@ export interface MemorialFields {
   offeringId: string;
   note: string;
   parentBurnTxid?: string;
+  /** onest.pet v5: raw 20-byte creator hash160 after the note. */
+  creatorHash160?: string;
   lokad: 'DANA';
 }
 
@@ -63,7 +69,11 @@ export function parseMemorialPushdata(data: Uint8Array): MemorialFields {
 
   let o = 4;
   const version = data[o++]!;
-  if (version !== DANA_VERSION && version !== DANA_VERSION_PARENT) {
+  if (
+    version !== DANA_VERSION &&
+    version !== DANA_VERSION_PARENT &&
+    version !== DANA_VERSION_PAW
+  ) {
     throw new Error(`unsupported DANA memorial version ${version}`);
   }
   const idLen = data[o++]!;
@@ -77,6 +87,14 @@ export function parseMemorialPushdata(data: Uint8Array): MemorialFields {
   o += noteLen;
 
   let parentBurnTxid: string | undefined;
+  let creatorHash160: string | undefined;
+  if (version === DANA_VERSION_PAW) {
+    if (o + DANA_CREATOR_HASH_LEN > data.length) {
+      throw new Error('creator truncated');
+    }
+    creatorHash160 = bytesToHex(data.subarray(o, o + DANA_CREATOR_HASH_LEN));
+    o += DANA_CREATOR_HASH_LEN;
+  }
   if (version >= DANA_VERSION_PARENT) {
     if (o >= data.length) throw new Error('parentLen missing');
     const parentLen = data[o++]!;
@@ -89,7 +107,7 @@ export function parseMemorialPushdata(data: Uint8Array): MemorialFields {
     }
   }
 
-  return { version, offeringId, note, parentBurnTxid, lokad: 'DANA' };
+  return { version, offeringId, note, parentBurnTxid, creatorHash160, lokad: 'DANA' };
 }
 
 export function parseDanaTip(data: Uint8Array): DanaTip | null {
@@ -105,7 +123,7 @@ export function parseDanaTip(data: Uint8Array): DanaTip | null {
   };
 }
 
-/** Find a DANA memorial (v1/v2) among EMPP pushes; skip tip ads (v4). */
+/** Find a DANA memorial (v1/v2/v5) among EMPP pushes; skip tip ads (v4). */
 export function memorialFromEmppPushes(
   pushes: Uint8Array[],
 ): MemorialFields | null {
@@ -114,7 +132,13 @@ export function memorialFromEmppPushes(
     if (push.length === DANA_TIP_LEN && push[4] === DANA_TIP_VERSION) continue;
     try {
       const parsed = parseMemorialPushdata(push);
-      if (parsed.version === 1 || parsed.version === 2) return parsed;
+      if (
+        parsed.version === DANA_VERSION ||
+        parsed.version === DANA_VERSION_PARENT ||
+        parsed.version === DANA_VERSION_PAW
+      ) {
+        return parsed;
+      }
     } catch {
       /* not a memorial push */
     }
@@ -130,21 +154,30 @@ export function tipFromEmppPushes(pushes: Uint8Array[]): DanaTip | null {
   return null;
 }
 
-/** Build DANA memorial push (tests / fixtures). */
+/** Build DANA memorial push (tests / fixtures). Pass `creatorHash160Hex` for a v5 (onest.pet) push. */
 export function memorialPushdata(
   note: string,
   offeringId = 'wlotus',
   parentBurnTxidHex?: string,
+  creatorHash160Hex?: string,
 ): Uint8Array {
   const idBytes = new TextEncoder().encode(offeringId);
   const noteBytes = new TextEncoder().encode(note);
   const parent = parentBurnTxidHex
     ? hexToParent(parentBurnTxidHex)
     : undefined;
-  const version = parent ? DANA_VERSION_PARENT : DANA_VERSION;
+  const creator = creatorHash160Hex
+    ? hexToCreator(creatorHash160Hex)
+    : undefined;
+  const version = creator
+    ? DANA_VERSION_PAW
+    : parent
+      ? DANA_VERSION_PARENT
+      : DANA_VERSION;
   const parentLen = parent ? DANA_PARENT_TXID_LEN : 0;
   const out = new Uint8Array(
     4 + 1 + 1 + idBytes.length + 1 + noteBytes.length +
+      (creator ? DANA_CREATOR_HASH_LEN : 0) +
       (version >= DANA_VERSION_PARENT ? 1 + parentLen : 0),
   );
   let o = 0;
@@ -157,6 +190,10 @@ export function memorialPushdata(
   out[o++] = noteBytes.length;
   out.set(noteBytes, o);
   o += noteBytes.length;
+  if (creator) {
+    out.set(creator, o);
+    o += DANA_CREATOR_HASH_LEN;
+  }
   if (version >= DANA_VERSION_PARENT) {
     out[o++] = parentLen;
     if (parent) out.set(parent, o);
@@ -192,5 +229,15 @@ function hexToParent(hex: string): Uint8Array {
   if (!/^[0-9a-f]{64}$/.test(h)) throw new Error('parentBurnTxid must be 64 hex');
   const out = new Uint8Array(32);
   for (let i = 0; i < 32; i++) out[i] = parseInt(h.slice(i * 2, i * 2 + 2), 16);
+  return out;
+}
+
+function hexToCreator(hex: string): Uint8Array {
+  const h = hex.trim().toLowerCase();
+  if (!/^[0-9a-f]{40}$/.test(h)) throw new Error('creatorHash160 must be 20 bytes hex');
+  const out = new Uint8Array(DANA_CREATOR_HASH_LEN);
+  for (let i = 0; i < DANA_CREATOR_HASH_LEN; i++) {
+    out[i] = parseInt(h.slice(i * 2, i * 2 + 2), 16);
+  }
   return out;
 }
