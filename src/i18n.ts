@@ -24,6 +24,8 @@ export interface Copy {
   /** Burned WLOTUS and PAW are all dana — the count label never names a token. */
   dana: string;
   remembrance: string;
+  species: string;
+  breed: string;
   birth: string;
   death: string;
   birthPlace: string;
@@ -69,6 +71,8 @@ export const MESSAGES: Record<Locale, Copy> = {
     genesisKind: 'Gốc token',
     dana: '{n} dana',
     remembrance: 'Lời tưởng nhớ',
+    species: 'Loài',
+    breed: 'Giống',
     birth: 'Sinh',
     death: 'Mất',
     birthPlace: 'Quê',
@@ -111,6 +115,8 @@ export const MESSAGES: Record<Locale, Copy> = {
     genesisKind: 'Lotus origin',
     dana: '{n} dana',
     remembrance: 'Remembrance',
+    species: 'Species',
+    breed: 'Breed',
     birth: 'Born',
     death: 'Died',
     birthPlace: 'Birthplace',
@@ -153,6 +159,8 @@ export const MESSAGES: Record<Locale, Copy> = {
     genesisKind: '莲花源起',
     dana: '{n} dana',
     remembrance: '追思',
+    species: '物种',
+    breed: '品种',
     birth: '生',
     death: '卒',
     birthPlace: '籍贯',
